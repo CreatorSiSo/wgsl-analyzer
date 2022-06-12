@@ -53,7 +53,7 @@ fn write_pretty_module_item(
             for field in strukt.fields.clone() {
                 let field = &module.data[field];
                 let ty = db.lookup_intern_type_ref(field.ty);
-                let _ = writeln!(f, "    {}: {};", field.name.0, ty);
+                let _ = writeln!(f, "\t{}: {};", field.name.0, ty);
             }
             let _ = write!(f, "}}");
         }

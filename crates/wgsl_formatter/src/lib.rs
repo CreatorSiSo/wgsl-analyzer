@@ -93,7 +93,7 @@ fn format_syntax_node(
                 create_whitespace(&format!(
                     "{}{}",
                     "\n".repeat(n_newlines),
-                    "    ".repeat(indentation)
+                    "\t".repeat(indentation)
                 )),
             );
         }
@@ -202,10 +202,7 @@ fn format_syntax_node(
             if has_newline {
                 set_whitespace_before(
                     stmt.right_brace_token()?,
-                    create_whitespace(&format!(
-                        "\n{}",
-                        "    ".repeat(indentation.saturating_sub(1))
-                    )),
+                    create_whitespace(&format!("\n{}", "\t".repeat(indentation.saturating_sub(1)))),
                 );
             }
         }
@@ -237,7 +234,7 @@ fn format_syntax_node(
             if has_newline {
                 set_whitespace_before(
                     param_list.right_paren_token()?,
-                    create_whitespace(&format!("\n{}", "    ".repeat(indentation))),
+                    create_whitespace(&format!("\n{}", "\t".repeat(indentation))),
                 );
             } else {
                 remove_if_whitespace(param_list.right_paren_token()?.prev_token()?);
@@ -287,7 +284,7 @@ fn format_param_list<T: AstNode>(
 
         let ws = match (first, has_newline) {
             (true, false) => create_whitespace(""),
-            (_, true) => create_whitespace(&format!("\n{}", "    ".repeat(n_indentations))),
+            (_, true) => create_whitespace(&format!("\n{}", "\t".repeat(n_indentations))),
             (false, false) => create_whitespace(" "),
         };
 
