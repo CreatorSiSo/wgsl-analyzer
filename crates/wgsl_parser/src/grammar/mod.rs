@@ -265,8 +265,29 @@ fn param_list(p: &mut Parser) {
     );
 }
 
+pub fn inner_param_list(p: &mut Parser) {
+    let m = p.start();
+    while !p.at_end() {
+        let location = p.location();
+        param(p);
+        if p.location() == location {
+            p.error();
+        }
+        p.eat(SyntaxKind::Comma);
+    }
+    m.complete(p, SyntaxKind::ParamList);
+}
+
 fn param(p: &mut Parser) {
     let m = p.start();
+
+    if p.at(SyntaxKind::UnofficialPreprocessorImport) {
+        let m_import = p.start();
+        import(p, m_import);
+        m.complete(p, SyntaxKind::Param);
+        return;
+    }
+
     attribute_list_opt(p);
     if p.at(SyntaxKind::ParenRight) {
         p.set_expected(vec![SyntaxKind::VariableIdentDecl]);
@@ -568,13 +589,18 @@ fn if_statement(p: &mut Parser) {
     let m = p.start();
     p.expect(SyntaxKind::If);
 
-    surround(
-        p,
-        SyntaxKind::ParenLeft,
-        SyntaxKind::ParenRight,
-        &[SyntaxKind::BraceLeft],
-        expr,
-    );
+    if p.at(SyntaxKind::ParenLeft) {
+        surround(
+            p,
+            SyntaxKind::ParenLeft,
+            SyntaxKind::ParenRight,
+            &[SyntaxKind::BraceLeft],
+            expr,
+        );
+    } else {
+        expr(p);
+    }
+
     compound_statement(p);
 
     while p.at(SyntaxKind::Else) {
